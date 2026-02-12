@@ -17,7 +17,7 @@ spec:
       containers:
       - name: rps-container
         # The line below is what the GitHub Action will constantly update
-        image: your-docker-user/rps-game:placeholder
+        image: rahulhs145/rps-game:v1
         ports:
         - containerPort: 5000
 ---
