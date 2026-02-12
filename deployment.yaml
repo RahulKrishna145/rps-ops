@@ -1,13 +1,39 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: rps-microservice
-spec:
-  replicas: 2
-  template:
-    spec:
-      containers:
-      - name: rps
-        image: your-docker-id/rps-game:initial-tag # CI replaces this tag
-        ports:
-        - containerPort: 5000
+name: GitOps-CI-Pipeline
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Build and Push Docker Image
+        run: |
+          # Use the Git Commit SHA as a unique tag
+          docker build -t ${{ secrets.DOCKER_USER }}/rps-game:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_USER }}/rps-game:${{ github.sha }}
+
+      - name: Update GitOps Manifest
+        run: |
+          # Clone the second repository (the Ops repo)
+          git clone https://${{ secrets.GITOPS_TOKEN }}@github.com/your-github-user/rps-ops.git
+          cd rps-ops
+          
+          # Update the image tag in deployment.yaml using sed
+          # This looks for the "image:" line and replaces everything after it
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USER }}/rps-game:${{ github.sha }}|g" deployment.yaml
+          
+          git config user.name "GitOps Bot"
+          git config user.email "bot@gitops.com"
+          git add deployment.yaml
+          git commit -m "Automated image update: ${{ github.sha }}"
+          git push
