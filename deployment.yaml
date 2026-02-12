@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rps-microservice
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: rps
+        image: your-docker-id/rps-game:initial-tag # CI replaces this tag
+        ports:
+        - containerPort: 5000
