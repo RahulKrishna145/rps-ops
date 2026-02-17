@@ -39,7 +39,7 @@ podAnnotations: {}
 podLabels: {}
 
 podSecurityContext: {}
-  # fsGroup: 2000
+# fsGroup: 2000
 
 securityContext: {}
   # capabilities:
@@ -137,7 +137,7 @@ readinessProbe:
   httpGet:
     path: /play/rock
     port: 5000
-  initalDelaySeconds: 5
+  initialDelaySeconds: 5
   periodSeconds: 5
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
